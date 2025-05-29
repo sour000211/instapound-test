@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>instapound - 계정 a 프로필</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fafafa;
+    color: #262626;
+    padding-top: 50px; /* 상단바 높이만큼 패딩 */
+  }
+
+  /* 상단바 스타일 */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px;
+    height: 50px;
+    background-color: #fafafa; /* 배경과 동일하게 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 10000;
+    box-sizing: border-box;
+    /* 좌우 끝까지 이어지는 구분선 효과 */
+    box-shadow: 0 1px 0 0 #dbdbdb,
+                inset 15px 0 0 #fafafa,
+                inset -15px 0 0 #fafafa;
+  }
+
+  /* 로고 스타일 - Instagram 로고와 비슷하게 */
+  .logo {
+    font-family: 'Grand Hotel', cursive;
+    font-size: 28px;
+    color: #262626;
+    user-select: none;
+    letter-spacing: 1.5px;
+    cursor: default;
+  }
+
+  /* 로그인, 가입 버튼 */
+  .top-buttons {
+    display: flex;
+    align-items: center;
+  }
+  .top-buttons button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    user-select: none;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.2s ease;
+  }
+  .login-btn {
+    background-color: #3897f0;
+    color: white;
+  }
+  .login-btn:hover {
+    background-color: #2a6ebd;
+  }
+  .signup-btn {
+    background-color: #fafafa; /* 변경됨 */
+    border: 1px solid #3897f0;
+    color: #3897f0;
+  }
+  .signup-btn:hover {
+    background-color: #f0f9ff;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #dbdbdb;
+  }
+  .profile-pic {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: url('https://via.placeholder.com/110') no-repeat center/cover;
+    margin-right: 30px;
+    cursor: pointer;
+  }
+  .profile-info {
+    flex: 1;
+  }
+  .username {
+    font-size: 28px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  /* 팔로우, 메시지 버튼 묶음 */
+  .btn-group {
+    margin-left: 15px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-group button {
+    padding: 5px 12px;
+    background-color: #dbdbdb; /* 회색으로 변경 */
+    border: none;
+    border-radius: 4px;
+    color: #262626;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .btn-group button:hover {
+    background-color: #c0c0c0;
+  }
+
+  /* 점 3개 아이콘 가로 나열 */
+  .more-icon-container {
+    position: relative;
+    margin-left: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .more-icon {
+    width: 24px;
+    height: 8px; /* 3개 점 가로로 나열 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background-color: #262626;
+    border-radius: 50%;
+  }
+
+  /* 옵션 상자 숨김 */
+  .option-box {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #262626;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+  }
+
+  /* 호버 시 옵션 보임 */
+  .more-icon-container:hover .option-box {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .stats {
+    display: flex;
+    margin: 15px 0;
+  }
+  .stats div {
+    margin-right: 40px;
+    font-size: 16px;
+  }
+  .stats div span {
+    font-weight: 600;
+  }
+  .bio {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* 피드 탭 */
+  .feed-tabs {
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #dbdbdb;
+    border-bottom: 1px solid #dbdbdb;
+    margin-top: 20px;
+  }
+  .feed-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #8e8e8e;
+    border-bottom: 2px solid transparent;
+    user-select: none;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .feed-tab.active {
+    color: #262626;
+    border-bottom: 2px solid #262626;
+  }
+
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 5px;
+  }
+  .post-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #dbdbdb;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .post-thumb:hover {
+    opacity: 0.8;
+  }
+
+  /* 숨김 파일 입력 */
+  input[type="file"] {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- 상단바 -->
+<div class="topbar">
+  <div class="logo">instapound</div>
+  <div class="top-buttons">
+    <button class="login-btn">로그인</button>
+    <button class="signup-btn">가입하기</button>
+  </div>
+</div>
+
+<header>
+  <label for="profile-upload" class="profile-pic" tabindex="0" aria-label="프로필 사진 업로드" role="button" title="프로필 사진 변경">
+  </label>
+  <input type="file" id="profile-upload" accept="image/*" />
+  <div class="profile-info">
+    <div class="username">
+      a
+      <div class="btn-group">
+        <button class="follow-btn" tabindex="0">팔로우</button>
+        <button class="message-btn" tabindex="0">메시지 보내기</button>
+      </div>
+      <div class="more-icon-container" aria-label="옵션">
+        <div class="more-icon" role="img" aria-hidden="true">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="option-box">옵션</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div><span>24</span> 게시물</div>
+      <div><span>340</span> 팔로워</div>
+      <div><span>180</span> 팔로잉</div>
+    </div>
+    <div class="bio">
+      안녕하세요! 이것은 instapound의 계정 a 프로필 페이지입니다.<br />
+      소소한 일상과 취미를 공유해요.
+    </div>
+  </div>
+</header>
+
+<!-- 피드 탭 -->
+<div class="feed-tabs" role="tablist" aria-label="피드 카테고리">
+  <div class="feed-tab active" role="tab" tabindex="0" aria-selected="true" aria-controls="posts-panel">게시물</div>
+  <div class="feed-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="reels-panel">릴스</div>
+  <div class="feed-tab" role="tab" tabindex="-1" aria-selected="false" aria-controls="tagged-panel">태그됨</div>
+</div>
+
+<!-- 게시물 섹션 -->
+<section id="posts-panel" class="posts" role="tabpanel" aria-labelledby="posts-tab">
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=1');" tabindex="0" aria-label="게시물 1" for="upload1"></label>
+  <input type="file" id="upload1" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=2');" tabindex="0" aria-label="게시물 2" for="upload2"></label>
+  <input type="file" id="upload2" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=3');" tabindex="0" aria-label="게시물 3" for="upload3"></label>
+  <input type="file" id="upload3" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=4');" tabindex="0" aria-label="게시물 4" for="upload4"></label>
+  <input type="file" id="upload4" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=5');" tabindex="0" aria-label="게시물 5" for="upload5"></label>
+  <input type="file" id="upload5" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=6');" tabindex="0" aria-label="게시물 6" for="upload6"></label>
+  <input type="file" id="upload6" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=7');" tabindex="0" aria-label="게시물 7" for="upload7"></label>
+  <input type="file" id="upload7" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=8');" tabindex="0" aria-label="게시물 8" for="upload8"></label>
+  <input type="file" id="upload8" accept="image/*" />
+  <label class="post-thumb" style="background-image:url('https://via.placeholder.com/200?text=9');" tabindex="0" aria-label="게시물 9" for="upload9"></label>
+  <input type="file" id="upload9" accept="image/*" />
+</section>
+
+<!-- 릴스 섹션 (빈 상태 표시) -->
+<section id="reels-panel" class="posts" role="tabpanel" aria-labelledby="reels-tab" hidden>
+  <p style="text-align:center; color:#888; margin-top:30px;">릴스 콘텐츠가 없습니다.</p>
+</section>
+
+<!-- 태그됨 섹션 (빈 상태 표시) -->
+<section id="tagged-panel" class="posts" role="tabpanel" aria-labelledby="tagged-tab" hidden>
+  <p style="text-align:center; color:#888; margin-top:30px;">태그된 게시물이 없습니다.</p>
+</section>
+
+<script>
+  // 탭 UI 동작 (간단 구현)
+  const tabs = document.querySelectorAll('.feed-tab');
+  const panels = {
+    '게시물': document.getElementById('posts-panel'),
+    '릴스': document.getElementById('reels-panel'),
+    '태그됨': document.getElementById('tagged-panel'),
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+        t.tabIndex = -1;
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      tab.tabIndex = 0;
+
+      for (const key in panels) {
+        panels[key].hidden = true;
+      }
+      const selected = tab.textContent;
+      panels[selected].hidden = false;
+    });
+  });
+
+  // 이미지 업로드 후 썸네일 변경 함수
+  function handleImageUpload(inputElement, targetLabel) {
+    if (inputElement.files && inputElement.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        targetLabel.style.backgroundImage = `url('${e.target.result}')`;
+      };
+      reader.readAsDataURL(inputElement.files[0]);
+    }
+  }
+
+  // 프로필 사진 업로드 이벤트
+  const profileInput = document.getElementById('profile-upload');
+  const profileLabel = document.querySelector('.profile-pic');
+  profileInput.addEventListener('change', () => {
+    handleImageUpload(profileInput, profileLabel);
+  });
+
+  // 게시물 업로드 이벤트들
+  for(let i=1; i<=9; i++) {
+    const input = document.getElementById(`upload${i}`);
+    const label = input.previousElementSibling; // label은 input 바로 이전 형제 요소
+    input.addEventListener('change', () => {
+      handleImageUpload(input, label);
+    });
+  }
+// 점 3개 버튼 클릭 시 수정 상자 표시
+document.querySelector('.more-icon-container').addEventListener('click', (e) => {
+  e.stopPropagation(); // 다른 클릭 이벤트와 충돌 방지
+  openEditBox();
+});
+
+// 수정 상자 열기
+function openEditBox() {
+  // 현재 값 읽어오기
+  document.getElementById('edit-username').value = document.querySelector('.username').childNodes[0].textContent.trim();
+  document.getElementById('edit-posts').value = document.querySelector('.stats div:nth-child(1) span').textContent;
+  document.getElementById('edit-followers').value = document.querySelector('.stats div:nth-child(2) span').textContent;
+  document.getElementById('edit-following').value = document.querySelector('.stats div:nth-child(3) span').textContent;
+  document.getElementById('edit-bio').value = document.querySelector('.bio').innerText.trim();
+  document.getElementById('edit-box').style.display = 'block';
+}
+
+// 수정 상자 닫기
+function closeEditBox() {
+  document.getElementById('edit-box').style.display = 'none';
+}
+
+// 수정 적용
+function saveProfileChanges() {
+  document.querySelector('.username').childNodes[0].textContent = document.getElementById('edit-username').value + ' ';
+  document.querySelector('.stats div:nth-child(1) span').textContent = document.getElementById('edit-posts').value;
+  document.querySelector('.stats div:nth-child(2) span').textContent = document.getElementById('edit-followers').value;
+  document.querySelector('.stats div:nth-child(3) span').textContent = document.getElementById('edit-following').value;
+  document.querySelector('.bio').innerText = document.getElementById('edit-bio').value;
+  closeEditBox();
+}
+
+</script>
+<div id="edit-box" style="
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  width: 300px;
+  display: none;
+  z-index: 9999;
+">
+  <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <strong>프로필 정보 수정</strong>
+    <button onclick="closeEditBox()" style="border:none; background:none; font-size:18px; cursor:pointer;">×</button>
+  </div>
+  <label>사용자명 <input type="text" id="edit-username" style="width:100%; margin-bottom:10px;"></label><br>
+  <label>게시물 수 <input type="number" id="edit-posts" style="width:100%; margin-bottom:10px;"></label><br>
+  <label>팔로워 수 <input type="number" id="edit-followers" style="width:100%; margin-bottom:10px;"></label><br>
+  <label>팔로잉 수 <input type="number" id="edit-following" style="width:100%; margin-bottom:10px;"></label><br>
+  <label>소개글 <textarea id="edit-bio" rows="3" style="width:100%; margin-top:10px;"></textarea></label><br>
+  <button onclick="saveProfileChanges()" style="
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px;
+    background-color: #3897f0;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+  ">저장</button>
+</div>
+</body>
+
+</html>
+
+
